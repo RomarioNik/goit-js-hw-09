@@ -14,7 +14,6 @@ const refs = {
 };
 
 let timeId = null;
-let newData = '';
 
 Notiflix.Notify.init({
   width: '300px',
@@ -49,14 +48,12 @@ const options = {
       return;
     }
 
-    newData = selectedData;
-    const data = convertTime(selectedData);
-    updateData(data);
+    updateData(convertTime(selectedData));
     enabledBtn(['startBtn', 'clearBtn']);
   },
 };
 
-flatpickr(refs.inputEl, options);
+const fp = flatpickr(refs.inputEl, options);
 
 refs.startBtn.addEventListener('click', handleClickStartBtn);
 refs.stopBtn.addEventListener('click', handleClickStopBtn);
@@ -77,8 +74,6 @@ function convertTime(timeStamp) {
   const hours = Math.floor((time / 1000 / 60 / 60) % 24);
   const minutes = Math.floor((time / 1000 / 60) % 60);
   const seconds = Math.floor((time / 1000) % 60);
-
-  //   console.log(`${days}:${hours}:${minutes}:${seconds}`);
 
   const data = {
     days: addLeadingZero(days),
@@ -106,12 +101,14 @@ function handleClickStartBtn() {
   enabledBtn(['stopBtn']);
 
   timeId = setInterval(() => {
-    if (newData <= Date.now()) {
+    const newdata = fp.selectedDates[0].getTime();
+
+    if (newdata <= Date.now()) {
       stopTimer();
       return;
     }
 
-    updateData(convertTime(newData));
+    updateData(convertTime(newdata));
   }, 1000);
 }
 
